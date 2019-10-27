@@ -31,7 +31,7 @@ export const useTaskInput = () => {
 
   const onChangeInputText = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputText(e.target!.value)
-    const parsed = parse(inputText)
+    const parsed = parse(e.target!.value)
 
     setTitle(parsed.text)
     if (parsed.duration > 0) {
