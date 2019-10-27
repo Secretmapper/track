@@ -56,10 +56,12 @@ const TaskInput: React.FC<ITaskInput> = props => {
           onChange={props.onChangeInputText}
           onFocus={props.onInputFocus}
           onBlur={props.onInputBlur}
+          show={props.expand}
         />
         <TaskInputAddButton
-          show={!props.isInputFocused}
+          show={!props.isInputFocused && !props.expand}
           onClick={props.onTriggerAdd}
+          tabIndex={-1}
         >
           +
         </TaskInputAddButton>
@@ -69,13 +71,17 @@ const TaskInput: React.FC<ITaskInput> = props => {
   )
 }
 
+type IShowable = {
+  readonly show: boolean
+}
+
 const Container = styled.div``
 
 const InputRow = styled.div`
   position: relative;
 `
 
-const Input = styled.input`
+const Input = styled.input<IShowable>`
   background-color: #efefef;
   border: 0;
   border-radius: 4px;
@@ -86,16 +92,17 @@ const Input = styled.input`
   transform-origin: right;
   transition: transform 0.3s;
   width: 100%;
+  ${props =>
+    props.show &&
+    `
+    transform: scaleX(1);
+  `};
   &:active,
   &:focus {
     transform: scaleX(1);
     background-color: #e0e0e0;
   }
 `
-
-type IShowable = {
-  readonly show: boolean
-}
 
 const TaskInputAddButton = styled.button<IShowable>`
   background-color: #484848;
