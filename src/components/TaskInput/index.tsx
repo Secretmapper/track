@@ -127,7 +127,7 @@ const TaskInput: React.FC<ITaskInput> = props => {
           onChange={props.onChangeInputText}
           onFocus={props.onInputFocus}
           onBlur={props.onInputBlur}
-          show={props.expand}
+          show={props.expand ? true : undefined}
           rows={1}
           maxRows={4}
         />
@@ -154,7 +154,7 @@ const TaskInput: React.FC<ITaskInput> = props => {
 }
 
 type IShowable = {
-  readonly show: boolean
+  readonly show?: boolean
 }
 
 const Container = styled.div`
