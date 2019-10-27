@@ -4,13 +4,13 @@
 const duration = /(-?\d*\.?\d+(?:e[-+]?\d+)?)\s*([a-z?]*)/gi
 
 parse.minute = parse.min = parse.m = 1000 * 60
-parse.hour = parse.hr = parse.min * 60
+parse.hour = parse.hr = parse.h = parse.min * 60
 
 /**
  * parse string to duration, and return string without duration
  *
  * @param {String} text
- * @return {Number}
+ * @return {{ duration: Number, text: String }}
  */
 function parse (text) {
   var result = 0
