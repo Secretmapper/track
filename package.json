@@ -16,7 +16,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "format": "prettier-standard --lint",
+    "precommit": "lint-staged"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -31,6 +33,17 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "lint-staged": "^9.4.2",
+    "modern-node": "^2.5.1",
+    "prettier-standard": "^15.0.1"
+  },
+  "lint-staged": {
+    "**/*": [
+      "prettier-standard --lint",
+      "git add"
     ]
   }
 }
