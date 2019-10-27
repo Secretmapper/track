@@ -11,6 +11,7 @@ export type ITaskInputDetail = {
   onAddCheckin: (event: React.MouseEvent<HTMLButtonElement>) => void
   onHourChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onMinuteChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onTagsChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 const TaskInputDetail: React.FC<ITaskInputDetail> = props => {
   const minutes = msToMinutes(props.duration)
@@ -48,6 +49,7 @@ const TaskInputDetail: React.FC<ITaskInputDetail> = props => {
         <InputDetailInput
           placeholder='Add tags'
           value={props.tags.join(', ')}
+          onChange={props.onTagsChange}
         />
       </InputDetailRow>
       <Button onClick={props.onAddCheckin}>Add Checkin</Button>
