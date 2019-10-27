@@ -21,6 +21,7 @@ const Input = styled.input`
   outline: 0;
   font-size: 20px;
   padding: 8px;
+  transform: scaleX(0);
   width: 100%;
   &:active,
   &:focus {
