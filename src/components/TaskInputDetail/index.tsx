@@ -1,14 +1,18 @@
 import React from 'react'
 import styled from 'styled-components'
+import { msToMinutes, msToHours } from '../../utils/time'
 
 export type ITaskInputDetail = {
   show: boolean
   description: string
   duration: number
+  onAddCheckin: (event: React.MouseEvent<HTMLButtonElement>) => void
+  onHourChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onMinuteChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 const TaskInputDetail: React.FC<ITaskInputDetail> = props => {
-  const minutes = Math.floor((props.duration / (1000 * 60)) % 60)
-  const hours = Math.floor(props.duration / (1000 * 60 * 60))
+  const minutes = msToMinutes(props.duration)
+  const hours = msToHours(props.duration)
 
   return (
     <Container show={props.show}>
@@ -16,19 +20,32 @@ const TaskInputDetail: React.FC<ITaskInputDetail> = props => {
       <InputDetailRow>
         <InputDetailLabel>duration</InputDetailLabel>
         <div>
-          <InputDetailDurInput value={hours} type='number' min='0' max='60' />{' '}
+          <InputDetailDurInput
+            value={hours}
+            onChange={props.onHourChange}
+            placeholder='Add tags'
+            type='number'
+            min='0'
+            max='60'
+          />{' '}
           hrs
         </div>
         <div>
-          <InputDetailDurInput value={minutes} type='number' min='0' max='59' />{' '}
+          <InputDetailDurInput
+            value={minutes}
+            onChange={props.onMinuteChange}
+            type='number'
+            min='0'
+            max='59'
+          />{' '}
           min
         </div>
       </InputDetailRow>
       <InputDetailRow>
         <InputDetailLabel>tags</InputDetailLabel>
-        <InputDetailInput />
+        <InputDetailInput placeholder='Add tags' />
       </InputDetailRow>
-      <Button>Add Checkin</Button>
+      <Button onClick={props.onAddCheckin}>Add Checkin</Button>
     </Container>
   )
 }

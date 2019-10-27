@@ -2,6 +2,12 @@ import React, { useRef, useState } from 'react'
 import styled from 'styled-components'
 import TaskInputDetail from '../TaskInputDetail'
 import parse from '../../utils/parser'
+import {
+  msToMinutes,
+  msToHours,
+  hoursToMs,
+  minutesToMs
+} from '../../utils/time'
 
 export const useTaskInput = () => {
   const inputEl = useRef<HTMLInputElement>(null)
@@ -20,11 +26,32 @@ export const useTaskInput = () => {
   }
 
   const [inputText, setInputText] = useState('')
+  const [title, setTitle] = useState('')
+  const [duration, setDuration] = useState(0)
+
   const onChangeInputText = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputText(e.target!.value)
+    const parsed = parse(inputText)
+
+    setTitle(parsed.text)
+    if (parsed.duration > 0) {
+      setDuration(parsed.duration)
+    }
   }
 
-  const parsed = parse(inputText)
+  const onHourChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDuration(
+      // XXX: this looks a bit weird, because msToMinutes/Hours
+      // only converts to whole units (result is floored)
+      minutesToMs(msToMinutes(duration)) + hoursToMs(parseInt(e.target.value))
+    )
+  }
+  const onMinuteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDuration(
+      hoursToMs(msToHours(duration)) + minutesToMs(parseInt(e.target.value))
+    )
+  }
+  const onAddCheckin = () => {}
 
   return {
     expand: inputText.length > 0,
@@ -35,9 +62,12 @@ export const useTaskInput = () => {
     onInputBlur,
     inputText,
     onChangeInputText,
+    onHourChange,
+    onMinuteChange,
+    onAddCheckin,
 
-    taskDescription: parsed.text,
-    taskDuration: parsed.duration
+    taskDescription: title,
+    taskDuration: duration
   }
 }
 
@@ -50,6 +80,9 @@ export type ITaskInput = {
   onInputBlur: (event: any) => void
   onInputFocus: (event: any) => void
   onTriggerAdd: (event: React.MouseEvent<HTMLButtonElement>) => void
+  onAddCheckin: (event: React.MouseEvent<HTMLButtonElement>) => void
+  onHourChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onMinuteChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 
   taskDescription: string
   taskDuration: number
@@ -79,6 +112,9 @@ const TaskInput: React.FC<ITaskInput> = props => {
         show={props.expand}
         description={props.taskDescription}
         duration={props.taskDuration}
+        onAddCheckin={props.onAddCheckin}
+        onHourChange={props.onHourChange}
+        onMinuteChange={props.onMinuteChange}
       />
     </Container>
   )
