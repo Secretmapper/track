@@ -9,7 +9,7 @@ import {
   minutesToMs
 } from '../../utils/time'
 
-export const useTaskInput = () => {
+export const useTaskInput = (cb: Function) => {
   const inputEl = useRef<HTMLInputElement>(null)
   const [isInputFocused, setInputFocused] = useState(false)
   const onTriggerAdd = () => {
@@ -51,7 +51,15 @@ export const useTaskInput = () => {
       hoursToMs(msToHours(duration)) + minutesToMs(parseInt(e.target.value))
     )
   }
-  const onAddCheckin = () => {}
+  const reset = () => {
+    setInputFocused(false)
+    setInputText('')
+    setTitle('')
+    setDuration(0)
+  }
+  const onAddCheckin = () => {
+    cb(title, duration, [], new Date().toISOString(), reset)
+  }
 
   return {
     expand: inputText.length > 0,

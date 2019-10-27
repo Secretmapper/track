@@ -1,15 +1,27 @@
 import React from 'react'
 import styled from 'styled-components'
 import TaskTag from '../TaskTag'
+import { msToMinutes, msToHours } from '../../utils/time'
 
-const TaskRow: React.FC = () => {
+export type ITaskRow = {
+  title: string
+  tags: string[]
+  duration: number
+}
+
+const TaskRow: React.FC<ITaskRow> = props => {
+  const minutes = msToMinutes(props.duration)
+  const hours = msToHours(props.duration)
+
   return (
     <Container>
       <TaskRowMain>
-        <TaskRowTitle>TaskName</TaskRowTitle>
+        <TaskRowTitle>{props.title}</TaskRowTitle>
         <TaskTagList />
       </TaskRowMain>
-      <TaskTime>5:30</TaskTime>
+      <TaskTime>
+        {hours}hrs {minutes}m
+      </TaskTime>
     </Container>
   )
 }
