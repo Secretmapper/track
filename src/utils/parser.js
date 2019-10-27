@@ -6,10 +6,8 @@ const duration = /(-?\d*\.?\d+(?:e[-+]?\d+)?)\s*([a-z?]*)/gi
 parse.minute = parse.min = parse.m = 1000 * 60
 parse.hour = parse.hr = parse.min * 60
 
-const hhmm = /(0[0-9]|1[0-9]|2[0-3]|[0-9]):[0-5][0-9]/g
-
 /**
- * parse string to duration
+ * parse string to duration, and return string without duration
  *
  * @param {String} text
  * @return {Number}
@@ -19,10 +17,10 @@ function parse (text) {
   // ignore commas
   const str = text.replace(/(\d),(\d)/g, '$1$2')
 
-  let parsedMin = false
-  let parsedHr = false
+  let parsedMin = null
+  let parsedHr = null
 
-  str.replace(duration, function (_, n, units) {
+  str.replace(duration, function (match, n, units, offset) {
     const unitValue =
       parse[units] || parse[units.toLowerCase().replace(/s$/, '')]
     if (unitValue) {
@@ -32,30 +30,56 @@ function parse (text) {
           return
         }
 
-        parsedMin = true
+        parsedMin = { match, offset }
       }
       if (unitValue === parse.hr) {
         if (parsedHr) {
           return
         }
 
-        parsedHr = true
+        parsedHr = { match, offset }
       }
       result += parseFloat(n, 10) * unitValue
     }
   })
 
-  if (result === 0) {
-    const arr = text.match(hhmm)
-    if (arr) {
-      const h = arr[0].split(':')[0]
-      const m = arr[0].split(':')[1]
+  if (result !== 0) {
+    // remove substring of parsed hr/min
+    text = text.split('').map((l, i) => {
+      const insideHr =
+        parsedHr &&
+        (parsedHr.offset <= i && i <= parsedHr.offset + parsedHr.match.length)
+      const insideMin =
+        parsedMin &&
+        (parsedMin.offset <= i &&
+          i <= parsedMin.offset + parsedMin.match.length)
+
+      return insideHr || insideMin ? '' : l
+    })
+    text = text.join('')
+  } else {
+    const hhmm = /(0[0-9]|1[0-9]|2[0-3]|[0-9]):[0-5][0-9]/g
+    // parse using hh:mm format
+    const match = hhmm.exec(text)
+    if (match) {
+      const h = match[0].split(':')[0]
+      const m = match[0].split(':')[1]
       result += h * parse.hr
       result += m * parse.min
+
+      text = removeSubstring(text, match.index, match[0].length)
     }
   }
 
-  return result
+  return {
+    duration: result,
+    text: text.trim()
+  }
+}
+
+// human readable format was parsed, trim substring
+function removeSubstring (str, offset, length) {
+  return str.substr(0, offset) + str.substr(offset + length)
 }
 
 export default parse
