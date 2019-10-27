@@ -10,6 +10,7 @@
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-scripts": "3.2.0",
+    "styled-components": "^4.4.0",
     "typescript": "3.6.4"
   },
   "scripts": {
@@ -36,6 +37,7 @@
     ]
   },
   "devDependencies": {
+    "@types/styled-components": "^4.1.19",
     "lint-staged": "^9.4.2",
     "modern-node": "^2.5.1",
     "prettier-standard": "^15.0.1"
