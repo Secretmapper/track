@@ -1,16 +1,50 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import styled from 'styled-components'
+import TaskInputDetail from '../TaskInputDetail'
 
 const TaskInput: React.FC = () => {
+  const inputEl = useRef<HTMLInputElement>(null)
+  const [isInputFocused, setInputFocused] = useState(false)
+  const onTriggerAdd = () => {
+    if (inputEl.current) {
+      inputEl.current!.focus()
+    }
+  }
+
+  const onInputFocus = () => {
+    setInputFocused(true)
+  }
+  const onInputBlur = () => {
+    setInputFocused(false)
+  }
+
+  const [inputText, setInputText] = useState('')
+  const onChangeInputText = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputText(e.target!.value)
+  }
+
   return (
     <Container>
-      <Input />
-      <TaskInputAddButton>+</TaskInputAddButton>
+      <InputRow>
+        <Input
+          value={inputText}
+          onChange={onChangeInputText}
+          ref={inputEl}
+          onFocus={onInputFocus}
+          onBlur={onInputBlur}
+        />
+        <TaskInputAddButton show={!isInputFocused} onClick={onTriggerAdd}>
+          +
+        </TaskInputAddButton>
+      </InputRow>
+      <TaskInputDetail show={inputText.length > 0} />
     </Container>
   )
 }
 
-const Container = styled.div`
+const Container = styled.div``
+
+const InputRow = styled.div`
   position: relative;
 `
 
@@ -22,14 +56,21 @@ const Input = styled.input`
   font-size: 20px;
   padding: 8px;
   transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s;
   width: 100%;
   &:active,
   &:focus {
+    transform: scaleX(1);
     background-color: #e0e0e0;
   }
 `
 
-const TaskInputAddButton = styled.button`
+type IShowable = {
+  readonly show: boolean
+}
+
+const TaskInputAddButton = styled.button<IShowable>`
   background-color: #484848;
   border-radius: 4px;
   border: none;
@@ -37,10 +78,17 @@ const TaskInputAddButton = styled.button`
   cursor: pointer;
   font-size: 30px;
   height: 40px;
-  position: absolute;
+  opacity: ${props => (props.show ? 1 : 0)};
+  ${props =>
+    !props.show &&
+    `
+    pointer-events: none;
+  `}
   padding-bottom: 4px;
+  position: absolute;
   right: 0;
   width: 40px;
+  transition: opacity 0.2s;
   &:focus,
   &:hover {
     background-color: #343434;
