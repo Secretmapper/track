@@ -7,6 +7,7 @@ export type ITaskInputDetail = {
   show: boolean
   description: string
   duration: number
+  tags: string[]
   onAddCheckin: (event: React.MouseEvent<HTMLButtonElement>) => void
   onHourChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onMinuteChange: (e: React.ChangeEvent<HTMLInputElement>) => void
@@ -44,7 +45,10 @@ const TaskInputDetail: React.FC<ITaskInputDetail> = props => {
       </InputDetailRow>
       <InputDetailRow>
         <InputDetailLabel>tags</InputDetailLabel>
-        <InputDetailInput placeholder='Add tags' />
+        <InputDetailInput
+          placeholder='Add tags'
+          value={props.tags.join(', ')}
+        />
       </InputDetailRow>
       <Button onClick={props.onAddCheckin}>Add Checkin</Button>
     </Container>

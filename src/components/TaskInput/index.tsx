@@ -29,6 +29,7 @@ export const useTaskInput = (cb: Function) => {
   const [inputText, setInputText] = useState('')
   const [title, setTitle] = useState('')
   const [duration, setDuration] = useState(0)
+  const [tags, setTags] = useState<string[]>([])
 
   const onChangeInputText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     // remove newlines
@@ -36,7 +37,16 @@ export const useTaskInput = (cb: Function) => {
     setInputText(value)
     const parsed = parse(value)
 
-    setTitle(parsed.text)
+    const hashregex = /(^|\s)(#[a-zA-Z\d-]+)/g
+    const matched = parsed.text.match(hashregex)
+
+    if (matched) {
+      setTags(matched.map(s => s.trim()).filter(s => s.length > 0))
+    }
+
+    const title = parsed.text.replace(hashregex, '')
+
+    setTitle(title)
     if (parsed.duration > 0) {
       setDuration(parsed.duration)
     }
@@ -77,6 +87,7 @@ export const useTaskInput = (cb: Function) => {
     onMinuteChange,
     onAddCheckin,
 
+    taskTags: tags,
     taskDescription: title,
     taskDuration: duration
   }
@@ -95,6 +106,7 @@ export type ITaskInput = {
   onHourChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onMinuteChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 
+  taskTags: string[]
   taskDescription: string
   taskDuration: number
 }
@@ -125,6 +137,7 @@ const TaskInput: React.FC<ITaskInput> = props => {
         show={props.expand}
         description={props.taskDescription}
         duration={props.taskDuration}
+        tags={props.taskTags}
         onAddCheckin={props.onAddCheckin}
         onHourChange={props.onHourChange}
         onMinuteChange={props.onMinuteChange}
