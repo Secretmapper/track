@@ -54,7 +54,7 @@ const Container = styled.div<{ show: boolean }>`
   position: absolute;
   background-color: #f6f6f6;
   border-radius: 4px;
-  height: 160px;
+  height: 200px;
   margin: 8px 0;
   padding: 4px;
   text-align: center;
@@ -68,14 +68,16 @@ const Container = styled.div<{ show: boolean }>`
   `}
 `
 
-const DescriptionInput = styled.input`
+const DescriptionInput = styled.textarea`
   background-color: rgba(0, 0, 0, 0);
   border: 0;
   border-bottom: 1px solid;
   border-color: #dedede;
   outline: 0;
+  font-family: inherit;
   font-size: 18px;
   font-weight: 500;
+  resize: none;
   padding: 8px;
   width: 100%;
 `

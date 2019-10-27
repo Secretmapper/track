@@ -81,7 +81,7 @@ const Rows = styled.div<{ show: boolean }>`
   ${props =>
     props.show &&
     `
-    transform: translate3d(0, 160px, 0);
+    transform: translate3d(0, 200px, 0);
   `}
 `
 

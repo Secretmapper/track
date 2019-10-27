@@ -10,7 +10,7 @@ import {
 } from '../../utils/time'
 
 export const useTaskInput = (cb: Function) => {
-  const inputEl = useRef<HTMLInputElement>(null)
+  const inputEl = useRef<HTMLTextAreaElement>(null)
   const [isInputFocused, setInputFocused] = useState(false)
   const onTriggerAdd = () => {
     if (inputEl.current) {
@@ -29,9 +29,11 @@ export const useTaskInput = (cb: Function) => {
   const [title, setTitle] = useState('')
   const [duration, setDuration] = useState(0)
 
-  const onChangeInputText = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputText(e.target!.value)
-    const parsed = parse(e.target!.value)
+  const onChangeInputText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    // remove newlines
+    const value = e.target!.value.replace(/(\r\n|\n|\r)/gm, '')
+    setInputText(value)
+    const parsed = parse(value)
 
     setTitle(parsed.text)
     if (parsed.duration > 0) {
@@ -81,10 +83,10 @@ export const useTaskInput = (cb: Function) => {
 
 export type ITaskInput = {
   expand: boolean
-  inputEl: React.RefObject<HTMLInputElement>
+  inputEl: React.RefObject<HTMLTextAreaElement>
   inputText: string
   isInputFocused: boolean
-  onChangeInputText: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onChangeInputText: (event: React.ChangeEvent<HTMLTextAreaElement>) => void
   onInputBlur: (event: any) => void
   onInputFocus: (event: any) => void
   onTriggerAdd: (event: React.MouseEvent<HTMLButtonElement>) => void
@@ -140,13 +142,15 @@ const InputRow = styled.div`
   position: relative;
 `
 
-const Input = styled.input<IShowable>`
+const Input = styled.textarea<IShowable>`
   background-color: #efefef;
   border: 0;
   border-radius: 4px;
   outline: 0;
   font-size: 20px;
+  font-family: inherit;
   padding: 8px;
+  resize: none;
   transform: scaleX(0);
   transform-origin: right;
   transition: transform 0.3s;
