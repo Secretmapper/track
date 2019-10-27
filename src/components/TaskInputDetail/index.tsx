@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import Textarea from 'react-autosize-textarea'
 import { msToMinutes, msToHours } from '../../utils/time'
 
 export type ITaskInputDetail = {
@@ -16,7 +17,7 @@ const TaskInputDetail: React.FC<ITaskInputDetail> = props => {
 
   return (
     <Container show={props.show}>
-      <DescriptionInput value={props.description} />
+      <DescriptionInput value={props.description} rows={1} maxRows={4} />
       <InputDetailRow>
         <InputDetailLabel>duration</InputDetailLabel>
         <div>
@@ -68,7 +69,7 @@ const Container = styled.div<{ show: boolean }>`
   `}
 `
 
-const DescriptionInput = styled.textarea`
+const DescriptionInput = styled(Textarea)`
   background-color: rgba(0, 0, 0, 0);
   border: 0;
   border-bottom: 1px solid;

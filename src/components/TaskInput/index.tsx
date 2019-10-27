@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react'
 import styled from 'styled-components'
+import Textarea from 'react-autosize-textarea'
 import TaskInputDetail from '../TaskInputDetail'
 import parse from '../../utils/parser'
 import {
@@ -109,6 +110,8 @@ const TaskInput: React.FC<ITaskInput> = props => {
           onFocus={props.onInputFocus}
           onBlur={props.onInputBlur}
           show={props.expand}
+          rows={1}
+          maxRows={4}
         />
         <TaskInputAddButton
           show={!props.isInputFocused && !props.expand}
@@ -142,7 +145,7 @@ const InputRow = styled.div`
   position: relative;
 `
 
-const Input = styled.textarea<IShowable>`
+const Input = styled(Textarea)<IShowable>`
   background-color: #efefef;
   border: 0;
   border-radius: 4px;

@@ -9,6 +9,7 @@
     "@types/react-dom": "16.9.3",
     "pouchdb": "^7.1.1",
     "react": "^16.11.0",
+    "react-autosize-textarea": "^7.0.0",
     "react-calendar": "^2.19.2",
     "react-dom": "^16.11.0",
     "react-pouchdb": "^2.0.0",
