@@ -3,14 +3,26 @@ import styled from 'styled-components'
 
 export type ITaskInputDetail = {
   show: boolean
+  description: string
+  duration: number
 }
 const TaskInputDetail: React.FC<ITaskInputDetail> = props => {
+  const minutes = Math.floor((props.duration / (1000 * 60)) % 60)
+  const hours = Math.floor(props.duration / (1000 * 60 * 60))
+
   return (
     <Container show={props.show}>
-      <DescriptionInput />
+      <DescriptionInput value={props.description} />
       <InputDetailRow>
         <InputDetailLabel>duration</InputDetailLabel>
-        <InputDetailInput />
+        <div>
+          <InputDetailDurInput value={hours} type='number' min='0' max='60' />{' '}
+          hrs
+        </div>
+        <div>
+          <InputDetailDurInput value={minutes} type='number' min='0' max='59' />{' '}
+          min
+        </div>
       </InputDetailRow>
       <InputDetailRow>
         <InputDetailLabel>tags</InputDetailLabel>
@@ -53,7 +65,7 @@ const DescriptionInput = styled.input`
 const InputDetailRow = styled.div`
   display: grid;
   padding: 8px;
-  grid-template-columns: 80px auto;
+  grid-template-columns: 80px auto auto;
 `
 
 const InputDetailLabel = styled.div`
@@ -69,6 +81,10 @@ const InputDetailInput = styled.input`
   border: 0;
   font-size: 14px;
   margin-left: 8px;
+`
+
+const InputDetailDurInput = styled(InputDetailInput)`
+  width: 50%;
 `
 
 const Button = styled.button`

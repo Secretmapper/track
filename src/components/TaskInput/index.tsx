@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react'
 import styled from 'styled-components'
 import TaskInputDetail from '../TaskInputDetail'
+import parse from '../../utils/parser'
 
 export const useTaskInput = () => {
   const inputEl = useRef<HTMLInputElement>(null)
@@ -23,6 +24,8 @@ export const useTaskInput = () => {
     setInputText(e.target!.value)
   }
 
+  const parsed = parse(inputText)
+
   return {
     expand: inputText.length > 0,
     inputEl,
@@ -31,7 +34,10 @@ export const useTaskInput = () => {
     onInputFocus,
     onInputBlur,
     inputText,
-    onChangeInputText
+    onChangeInputText,
+
+    taskDescription: parsed.text,
+    taskDuration: parsed.duration
   }
 }
 
@@ -44,6 +50,9 @@ export type ITaskInput = {
   onInputBlur: (event: any) => void
   onInputFocus: (event: any) => void
   onTriggerAdd: (event: React.MouseEvent<HTMLButtonElement>) => void
+
+  taskDescription: string
+  taskDuration: number
 }
 
 const TaskInput: React.FC<ITaskInput> = props => {
@@ -66,7 +75,11 @@ const TaskInput: React.FC<ITaskInput> = props => {
           +
         </TaskInputAddButton>
       </InputRow>
-      <TaskInputDetail show={props.expand} />
+      <TaskInputDetail
+        show={props.expand}
+        description={props.taskDescription}
+        duration={props.taskDuration}
+      />
     </Container>
   )
 }
