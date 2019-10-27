@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react'
 import styled from 'styled-components'
 import TaskInputDetail from '../TaskInputDetail'
 
-const TaskInput: React.FC = () => {
+export const useTaskInput = () => {
   const inputEl = useRef<HTMLInputElement>(null)
   const [isInputFocused, setInputFocused] = useState(false)
   const onTriggerAdd = () => {
@@ -23,21 +23,48 @@ const TaskInput: React.FC = () => {
     setInputText(e.target!.value)
   }
 
+  return {
+    expand: inputText.length > 0,
+    inputEl,
+    isInputFocused,
+    onTriggerAdd,
+    onInputFocus,
+    onInputBlur,
+    inputText,
+    onChangeInputText
+  }
+}
+
+export type ITaskInput = {
+  expand: boolean
+  inputEl: React.RefObject<HTMLInputElement>
+  inputText: string
+  isInputFocused: boolean
+  onChangeInputText: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onInputBlur: (event: any) => void
+  onInputFocus: (event: any) => void
+  onTriggerAdd: (event: React.MouseEvent<HTMLButtonElement>) => void
+}
+
+const TaskInput: React.FC<ITaskInput> = props => {
   return (
     <Container>
       <InputRow>
         <Input
-          value={inputText}
-          onChange={onChangeInputText}
-          ref={inputEl}
-          onFocus={onInputFocus}
-          onBlur={onInputBlur}
+          value={props.inputText}
+          ref={props.inputEl}
+          onChange={props.onChangeInputText}
+          onFocus={props.onInputFocus}
+          onBlur={props.onInputBlur}
         />
-        <TaskInputAddButton show={!isInputFocused} onClick={onTriggerAdd}>
+        <TaskInputAddButton
+          show={!props.isInputFocused}
+          onClick={props.onTriggerAdd}
+        >
           +
         </TaskInputAddButton>
       </InputRow>
-      <TaskInputDetail show={inputText.length > 0} />
+      <TaskInputDetail show={props.expand} />
     </Container>
   )
 }

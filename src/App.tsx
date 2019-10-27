@@ -1,23 +1,10 @@
 import React from 'react'
 import Layout from './components/Layout'
-import TaskRow from './components/TaskRow'
+import TaskInputDashboard from './components/TaskInputDashboard'
 import TaskStats from './components/TaskStats'
-import TaskInput from './components/TaskInput'
 
 const App: React.FC = () => {
-  return (
-    <Layout
-      aside={
-        <React.Fragment>
-          <TaskInput />
-          <TaskRow />
-          <TaskRow />
-          <TaskRow />
-        </React.Fragment>
-      }
-      main={<TaskStats />}
-    />
-  )
+  return <Layout aside={<TaskInputDashboard />} main={<TaskStats />} />
 }
 
 export default App
