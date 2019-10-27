@@ -10,3 +10,6 @@ export const minutesToMs = (dur: number) => {
 export const hoursToMs = (dur: number) => {
   return dur * 60 * 60 * 1000
 }
+export const ISODate = (date: Date) => {
+  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
+}

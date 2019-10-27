@@ -51,6 +51,7 @@ const TaskInputDetail: React.FC<ITaskInputDetail> = props => {
 }
 
 const Container = styled.div<{ show: boolean }>`
+  position: absolute;
   background-color: #f6f6f6;
   border-radius: 4px;
   height: 160px;

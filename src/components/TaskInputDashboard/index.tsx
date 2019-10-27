@@ -1,13 +1,18 @@
-import React, { Suspense } from 'react'
+import React, { useState, Suspense } from 'react'
 import styled from 'styled-components'
+import Calendar from 'react-calendar'
 import TaskRow from '../TaskRow'
 import TaskInput, { useTaskInput } from '../TaskInput'
+import { ISODate } from '../../utils/time'
 
 import { PouchDB, useDB, useFind } from 'react-pouchdb'
 
-const Tasks: React.FC = () => {
+type ITasks = {
+  date: Date
+}
+const Tasks: React.FC<ITasks> = props => {
   const docs = useFind({
-    selector: { date: { $gte: '2019-10-27', $lte: '2019-10-28' } }
+    selector: { date: { $eq: ISODate(props.date) } }
   })
 
   return docs.map((doc: any) => (
@@ -22,42 +27,77 @@ const Tasks: React.FC = () => {
 
 const TaskInputDashboard: React.FC = () => {
   const db = useDB('tasks')
+
+  const [date, setDate] = useState(() => new Date())
   const taskInput = useTaskInput(
     (
       title: string,
       duration: number,
       tags: string[],
-      date: string,
+      _date: string,
       reset: Function
     ) => {
-      db.post({ title, duration, tags, date })
+      db.post({ title, duration, tags, date: ISODate(date) })
       reset()
     }
   )
 
   return (
-    <React.Fragment>
-      <PouchDB name='tasks'>
+    <PouchDB name='tasks'>
+      <Container>
         <TaskInput {...taskInput} />
         <Rows show={taskInput.expand}>
+          <TaskCalendar
+            value={date}
+            onChange={date => {
+              if (!(date instanceof Array)) {
+                setDate(date)
+              }
+            }}
+            maxDate={new Date()}
+            minDetail='month'
+            prev2Label={null}
+            next2Label={null}
+          />
           <Suspense fallback=''>
-            <Tasks />
+            <Tasks date={date} />
           </Suspense>
         </Rows>
-      </PouchDB>
-    </React.Fragment>
+      </Container>
+    </PouchDB>
   )
 }
 
+const Container = styled.div`
+  height: 100vh;
+  padding: 8px;
+  overflow: auto;
+`
+
 const Rows = styled.div<{ show: boolean }>`
   position: relative;
-  transform: translate3d(0, -160px, 0);
+  transform: translate3d(0, 0, 0);
   transition: transform 0.2s;
   ${props =>
     props.show &&
     `
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 160px, 0);
   `}
+`
+
+const TaskCalendar = styled(Calendar)`
+  && {
+    border: 0;
+    width: 100%;
+  }
+
+  .react-calendar__navigation button[disabled] {
+    background-color: white;
+  }
+  .react-calendar__navigation__label {
+    color: black;
+    font-size: 24px;
+  }
 `
 
 export default TaskInputDashboard

@@ -132,7 +132,9 @@ type IShowable = {
   readonly show: boolean
 }
 
-const Container = styled.div``
+const Container = styled.div`
+  position: relative;
+`
 
 const InputRow = styled.div`
   position: relative;

@@ -20,7 +20,6 @@ const Container = styled.div`
 `
 
 const Aside = styled.div`
-  padding: 8px;
   width: 400px;
 `
 
