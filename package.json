@@ -4,11 +4,13 @@
   "private": true,
   "dependencies": {
     "@types/jest": "24.0.20",
+    "@types/lodash": "^4.14.144",
     "@types/node": "12.11.7",
     "@types/react": "16.9.11",
     "@types/react-dom": "16.9.3",
     "@types/victory": "^33.0.0",
     "date-fns": "^2.6.0",
+    "lodash": "^4.17.15",
     "pouchdb": "^7.1.1",
     "react": "^16.11.0",
     "react-autosize-textarea": "^7.0.0",

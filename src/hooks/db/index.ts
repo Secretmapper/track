@@ -1,6 +1,7 @@
 import { useDB } from 'react-pouchdb'
 import usePromise from 'react-use-promise'
 import { ISODate } from '../../utils/time'
+import ld from 'lodash'
 
 type TaskStat = { x: string; y: number; label: string }
 export type ITaskStats = [
@@ -15,7 +16,7 @@ export const useSaveTask = () => {
     db.post({
       title,
       duration,
-      tags,
+      tags: ld.uniq(tags),
       date: ISODate(date).split('-')
     })
   }
