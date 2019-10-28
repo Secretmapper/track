@@ -68,6 +68,7 @@ const Container = styled.div<{ show: boolean }>`
   transition: transform 0.2s;
   transform: scale3d(0, 0, 0) translateY(200px);
   transform-origin: top;
+  width: 100%;
   ${props =>
     props.show &&
     `
