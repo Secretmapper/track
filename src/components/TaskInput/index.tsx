@@ -3,14 +3,16 @@ import styled from 'styled-components'
 import Textarea from 'react-autosize-textarea'
 import TaskInputDetail from '../TaskInputDetail'
 import parse from '../../utils/parser'
+import { useSaveTask } from '../../hooks/db'
 import {
+  ISODate,
   msToMinutes,
   msToHours,
   hoursToMs,
   minutesToMs
 } from '../../utils/time'
 
-export const useTaskInput = (cb: Function) => {
+export const useTaskInput = (date: Date) => {
   const inputEl = useRef<HTMLTextAreaElement>(null)
   const [isInputFocused, setInputFocused] = useState(false)
   const onTriggerAdd = () => {
@@ -74,8 +76,10 @@ export const useTaskInput = (cb: Function) => {
     setDuration(0)
     setTags([])
   }
+  const saveTask = useSaveTask()
   const onAddCheckin = () => {
-    cb(title, duration, tags, new Date().toISOString(), reset)
+    saveTask(title, duration, tags, date)
+    reset()
   }
 
   return {

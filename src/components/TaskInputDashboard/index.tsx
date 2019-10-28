@@ -5,7 +5,7 @@ import TaskRow from '../TaskRow'
 import TaskInput, { useTaskInput } from '../TaskInput'
 import { ISODate } from '../../utils/time'
 
-import { PouchDB, useDB, useFind } from 'react-pouchdb'
+import { PouchDB, useFind } from 'react-pouchdb'
 
 type ITasks = {
   date: Date
@@ -26,21 +26,8 @@ const Tasks: React.FC<ITasks> = props => {
 }
 
 const TaskInputDashboard: React.FC = () => {
-  const db = useDB('tasks')
-
   const [date, setDate] = useState(() => new Date())
-  const taskInput = useTaskInput(
-    (
-      title: string,
-      duration: number,
-      tags: string[],
-      _date: string,
-      reset: Function
-    ) => {
-      db.post({ title, duration, tags, date: ISODate(date) })
-      reset()
-    }
-  )
+  const taskInput = useTaskInput(date)
 
   return (
     <PouchDB name='tasks'>

@@ -1,6 +1,6 @@
 import { useDB } from 'react-pouchdb'
 import usePromise from 'react-use-promise'
-import { ISODate } from '../../utils/time'
+import { ISODate, msToMinutes } from '../../utils/time'
 
 type TaskStat = { x: string; y: number; label: string }
 export type ITaskStats = [
@@ -8,6 +8,18 @@ export type ITaskStats = [
   Array<{ value: number; tag: string }>
 ]
 type queryResults = { value: number; key: [string, string] }
+
+export const useSaveTask = () => {
+  const db = useDB('tasks')
+  return (title: string, duration: number, tags: string[], date: Date) => {
+    db.post({
+      title,
+      duration,
+      tags,
+      date: ISODate(date)
+    })
+  }
+}
 
 export const useTaskStats = (): ITaskStats => {
   const db = useDB('tasks')
@@ -40,7 +52,7 @@ export const useTaskStats = (): ITaskStats => {
 
   const hash: { [key: string]: Array<TaskStat> } = {}
   if (result) {
-    result.rows.map(({ value, key }: queryResults) => {
+    result.rows.forEach(({ value, key }: queryResults) => {
       const [date, tag] = key
       if (!(tag in hash)) {
         hash[tag] = []
