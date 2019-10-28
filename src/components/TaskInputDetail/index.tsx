@@ -19,16 +19,20 @@ export const useTaskInputDetail = (dTitle = '', dDuration = 0, dTags = []) => {
     setTitle(value)
   }
   const onHourChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDuration(
-      // XXX: this looks a bit weird, because msToMinutes/Hours
-      // only converts to whole units (result is floored)
-      minutesToMs(msToMinutes(duration)) + hoursToMs(parseInt(e.target.value))
-    )
+    if (!isNaN(parseInt(e.target.value))) {
+      setDuration(
+        // XXX: this looks a bit weird, because msToMinutes/Hours
+        // only converts to whole units (result is floored)
+        minutesToMs(msToMinutes(duration)) + hoursToMs(parseInt(e.target.value))
+      )
+    }
   }
   const onMinuteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDuration(
-      hoursToMs(msToHours(duration)) + minutesToMs(parseInt(e.target.value))
-    )
+    if (!isNaN(parseInt(e.target.value))) {
+      setDuration(
+        hoursToMs(msToHours(duration)) + minutesToMs(parseInt(e.target.value))
+      )
+    }
   }
   const onTagsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = removeNewlines(e.target!.value)
