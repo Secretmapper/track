@@ -1,11 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { useDB } from 'react-pouchdb'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { PouchDB, useDB } from 'react-pouchdb'
 import { ISODate } from '../../utils/time'
 import ld from 'lodash'
 
-type TaskStat = { x: string | number; y: number; tag: string; label: string }
 export type ITaskStats = [Array<{ value: number; key: string }>]
-type queryResults = { value: number; key: [string, string, string, string] }
 
 // we use this context value to force rerenders on task data changes
 // as map/reduce queries cannot be subscribed to
@@ -13,6 +11,19 @@ export const TasksKeyContext = React.createContext({
   value: 0,
   retrigger: () => {}
 })
+
+export const DBProvider: React.FC = props => {
+  const [value, setValue] = useState(0)
+  const retrigger = useCallback(() => {
+    setValue(v => v + 1)
+  }, [setValue])
+
+  return (
+    <TasksKeyContext.Provider value={{ value, retrigger }}>
+      <PouchDB name='tasks'>{props.children}</PouchDB>
+    </TasksKeyContext.Provider>
+  )
+}
 
 export const useSaveTask = () => {
   const db = useDB('tasks')
@@ -48,7 +59,7 @@ export const useSaveTask = () => {
   }
 }
 
-export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
+export const useTaskStats = (): ITaskStats => {
   const { value } = useContext(TasksKeyContext)
   const [result, setResult] = useState<any>(null)
   const db = useDB()
@@ -75,7 +86,7 @@ export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
     }
 
     query()
-  }, [value, startDate, endDate, db])
+  }, [value, db])
   const tags = result ? result.rows : []
 
   return [tags]

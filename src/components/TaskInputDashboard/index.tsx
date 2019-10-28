@@ -8,6 +8,34 @@ import { useDeleteTask, useSaveTask, dateForDb } from '../../hooks/db'
 
 import { useFind } from 'react-pouchdb'
 
+const TaskInputDashboard: React.FC = () => {
+  const [date, setDate] = useState(() => new Date())
+  const taskInput = useTaskInput(date)
+
+  return (
+    <Container>
+      <TaskInput {...taskInput} />
+      <Rows show={taskInput.expand}>
+        <TaskCalendar
+          value={date}
+          onChange={date => {
+            if (!(date instanceof Array)) {
+              setDate(date)
+            }
+          }}
+          maxDate={new Date()}
+          minDetail='month'
+          prev2Label={null}
+          next2Label={null}
+        />
+        <Suspense fallback=''>
+          <Tasks date={date} />
+        </Suspense>
+      </Rows>
+    </Container>
+  )
+}
+
 type ITasks = {
   date: Date
 }
@@ -76,34 +104,6 @@ const EditableTaskInputDetail = (props: any) => {
       }}
       onDelete={props.onDelete}
     />
-  )
-}
-
-const TaskInputDashboard: React.FC = () => {
-  const [date, setDate] = useState(() => new Date())
-  const taskInput = useTaskInput(date)
-
-  return (
-    <Container>
-      <TaskInput {...taskInput} />
-      <Rows show={taskInput.expand}>
-        <TaskCalendar
-          value={date}
-          onChange={date => {
-            if (!(date instanceof Array)) {
-              setDate(date)
-            }
-          }}
-          maxDate={new Date()}
-          minDetail='month'
-          prev2Label={null}
-          next2Label={null}
-        />
-        <Suspense fallback=''>
-          <Tasks date={date} />
-        </Suspense>
-      </Rows>
-    </Container>
   )
 }
 

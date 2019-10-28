@@ -1,6 +1,5 @@
-import React, { Suspense, useState } from 'react'
+import React, { Suspense } from 'react'
 import styled from 'styled-components'
-import { addWeeks } from 'date-fns'
 import colorHash from '../../utils/colorHash'
 import TaskTag from '../TaskTag'
 import { useTaskStats } from '../../hooks/db'
@@ -9,26 +8,18 @@ import { msToMinutes, msToHours } from '../../utils/time'
 import { VictoryPie } from 'victory'
 
 const TaskStats: React.FC = () => {
-  const [endDate] = useState(new Date())
-  const [startDate] = useState(addWeeks(endDate, -1))
-
   return (
     <Container>
       <HeatmapContainer />
       <Suspense fallback=''>
-        <TaskList startDate={startDate} endDate={endDate} />
+        <TaskList />
       </Suspense>
     </Container>
   )
 }
 
-type ITaskList = {
-  startDate: Date
-  endDate: Date
-}
-
-const TaskList: React.FC<ITaskList> = props => {
-  const [tags] = useTaskStats(props.startDate, props.endDate)
+const TaskList: React.FC = () => {
+  const [tags] = useTaskStats()
 
   // we append this to the label to workaround for
   // https://github.com/FormidableLabs/victory/issues/928
