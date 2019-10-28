@@ -1,6 +1,5 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useDB } from 'react-pouchdb'
-import usePromise from 'react-use-promise'
 import { ISODate } from '../../utils/time'
 import { eachDayOfInterval } from 'date-fns'
 import ld from 'lodash'
@@ -56,11 +55,12 @@ export const useSaveTask = () => {
 
 export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
   const { value } = useContext(TasksKeyContext)
+  const [result, setResult] = useState<any>(null)
   const db = useDB()
 
-  const [result] = usePromise(
-    () =>
-      db.query(
+  useEffect(() => {
+    async function query () {
+      const result = await db.query(
         {
           map: function (doc: any, emit: any) {
             for (let i = 0; i < doc.tags.length; i++) {
@@ -80,9 +80,12 @@ export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
           group_level: 4,
           reduce: true
         }
-      ),
-    [value]
-  )
+      )
+      setResult(result)
+    }
+
+    query()
+  }, [value])
 
   const hash: { [key: string]: Array<TaskStat> } = {}
   if (result) {
@@ -119,5 +122,9 @@ export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
 
 export const useDeleteTask = () => {
   const db = useDB('tasks')
-  return db.remove
+  const { retrigger } = useContext(TasksKeyContext)
+
+  return (doc: any) => {
+    db.remove(doc, retrigger)
+  }
 }
