@@ -65,8 +65,10 @@ export const useTaskInput = (date: Date) => {
       hoursToMs(msToHours(duration)) + minutesToMs(parseInt(e.target.value))
     )
   }
-  const onTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTags(e.target.value.split(', '))
+  const onTagsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    // remove newlines
+    const value = e.target!.value.replace(/(\r\n|\n|\r)/gm, '')
+    setTags(value.split(', '))
   }
   const reset = () => {
     setInputFocused(false)
@@ -113,7 +115,7 @@ export type ITaskInput = {
   onAddCheckin: (event: React.MouseEvent<HTMLButtonElement>) => void
   onHourChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onMinuteChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  onTagsChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onTagsChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
 
   taskTags: string[]
   taskDescription: string

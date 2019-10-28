@@ -11,7 +11,7 @@ export type ITaskInputDetail = {
   onAddCheckin: (event: React.MouseEvent<HTMLButtonElement>) => void
   onHourChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onMinuteChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  onTagsChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onTagsChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
 }
 const TaskInputDetail: React.FC<ITaskInputDetail> = props => {
   const minutes = msToMinutes(props.duration)
@@ -46,10 +46,12 @@ const TaskInputDetail: React.FC<ITaskInputDetail> = props => {
       </InputDetailRow>
       <InputDetailRow>
         <InputDetailLabel>tags</InputDetailLabel>
-        <InputDetailInput
+        <InputDetailInputTags
           placeholder='Add tags'
           value={props.tags.join(', ')}
           onChange={props.onTagsChange}
+          rows={1}
+          maxRows={3}
         />
       </InputDetailRow>
       <Button onClick={props.onAddCheckin}>Add Checkin</Button>
@@ -109,6 +111,16 @@ const InputDetailInput = styled.input`
   border: 0;
   font-size: 14px;
   margin-left: 8px;
+`
+
+const InputDetailInputTags = styled(Textarea)`
+  align-self: end;
+  background: none;
+  border: 0;
+  font-size: 14px;
+  margin-left: 8px;
+  resize: none;
+  width: 100%;
 `
 
 const InputDetailDurInput = styled(InputDetailInput)`

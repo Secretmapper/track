@@ -16,7 +16,14 @@ export const useSaveTask = () => {
     db.post({
       title,
       duration,
-      tags: ld.uniq(tags),
+      // join tags, split on ',', trim and remove ln < 0
+      tags: ld.uniq(
+        tags
+          .join(',')
+          .split(',')
+          .map(s => s.trim())
+          .filter(i => i.length > 0)
+      ),
       date: ISODate(date).split('-')
     })
   }
