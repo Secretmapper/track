@@ -17,8 +17,11 @@ const Tasks: React.FC<ITasks> = props => {
     selector: { date: { $eq: ISODate(props.date).split('-') } }
   })
   const [activeId, setActiveId] = useState<string>('')
-  const saveTask = useSaveTask()
+  const saveTask: ReturnType<typeof useSaveTask> = useSaveTask()
   const removeTask = useDeleteTask()
+  const onClearActive = () => {
+    setActiveId('')
+  }
 
   return docs.map((doc: any) => (
     <React.Fragment key={doc._id}>
@@ -36,6 +39,7 @@ const Tasks: React.FC<ITasks> = props => {
           description={doc.title}
           duration={doc.duration}
           tags={doc.tags}
+          onClearActive={onClearActive}
           onSave={saveTask}
           onDelete={() => {
             removeTask(doc)
@@ -69,6 +73,7 @@ const EditableTaskInputDetail = (props: any) => {
       label='Save'
       onAddCheckin={() => {
         props.onSave(title, duration, tags, date, props.doc)
+        props.onClearActive()
       }}
       onDelete={props.onDelete}
     />

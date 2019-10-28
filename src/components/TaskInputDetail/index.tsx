@@ -109,7 +109,12 @@ const TaskInputDetail: React.FC<ITaskInputDetail> = props => {
           maxRows={3}
         />
       </InputDetailRow>
-      <Button onClick={props.onAddCheckin}>
+      <Button
+        onClick={props.onAddCheckin}
+        disabled={
+          !(props.description && props.duration && props.tags.length > 0)
+        }
+      >
         {props.label || 'Add Checkin'}
       </Button>
       {props.onDelete && (
@@ -207,6 +212,11 @@ const Button = styled.button<{ variant?: string }>`
   &:active,
   &:focus {
     background: #0090e9;
+  }
+  &:disabled {
+    background: #0060ff;
+    cursor: not-allowed;
+    opacity: 0.5;
   }
   ${props =>
     props.variant === 'delete' &&
