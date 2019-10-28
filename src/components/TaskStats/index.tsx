@@ -50,12 +50,12 @@ const TaskList: React.FC<ITaskList> = props => {
       {tags.map(({ value, tag }) => (
         <div key={tag}>
           {tag && (
-            <React.Fragment>
+            <TaskTagRow>
               <TaskTag>{tag}</TaskTag>
               <TaskTagTime>
                 {msToHours(value)}h {msToMinutes(value)}m
               </TaskTagTime>
-            </React.Fragment>
+            </TaskTagRow>
           )}
         </div>
       ))}
@@ -74,6 +74,10 @@ const HeatmapContainer = styled.div``
 
 const TaskStatsDate = styled.h2`
   margin-top: 8px;
+`
+
+const TaskTagRow = styled.div`
+  margin-bottom: 4px;
 `
 
 const TaskTagTime = styled.span`

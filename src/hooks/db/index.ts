@@ -3,7 +3,7 @@ import usePromise from 'react-use-promise'
 import { ISODate } from '../../utils/time'
 import ld from 'lodash'
 
-type TaskStat = { x: string; y: number; label: string }
+type TaskStat = { x: string; y: number; tag: string; label: string }
 export type ITaskStats = [
   { [key: string]: Array<TaskStat> },
   Array<{ value: number; tag: string }>
@@ -70,15 +70,7 @@ export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
     []
   )
 
-  const hash: { [key: string]: Array<TaskStat> } = {
-    '': [
-      {
-        x: '2019',
-        y: 0,
-        label: ''
-      }
-    ]
-  }
+  const hash: { [key: string]: Array<TaskStat> } = {}
   if (result) {
     result.rows.forEach(({ value, key }: queryResults) => {
       const [tag, y, m, d] = key
@@ -86,7 +78,7 @@ export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
         hash[tag] = []
       }
 
-      hash[tag].push({ x: d, y: value, label: '' })
+      hash[tag].push({ x: d, y: value, tag, label: '' })
     })
   }
   const sumHashValues = (o: Array<TaskStat>) =>
@@ -94,7 +86,7 @@ export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
   const tags: ITaskStats[1] = result
     ? Object.values(hash)
         .map(o => ({
-          tag: o[0].label,
+          tag: o[0].tag,
           value: sumHashValues(o)
         }))
         .sort((a, b) => b.value - a.value)
