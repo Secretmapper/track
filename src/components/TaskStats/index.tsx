@@ -33,12 +33,13 @@ type ITaskList = {
 }
 
 const TaskList: React.FC<ITaskList> = props => {
-  const [stats, tags] = useTaskStats(props.startDate, props.endDate)
+  const [stats, tags, interval] = useTaskStats(props.startDate, props.endDate)
 
   return (
     <div>
       <VictoryChart domainPadding={{ x: 50 }} scale={{ x: 'time' }}>
         <VictoryStack colorScale='heatmap' style={victoryStyles}>
+          <VictoryBar data={interval} />
           {Object.keys(stats).map(tag => (
             <VictoryBar key={tag} data={stats[tag]} style={barStyles(tag)} />
           ))}

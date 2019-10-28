@@ -2,12 +2,14 @@ import React, { useContext } from 'react'
 import { useDB } from 'react-pouchdb'
 import usePromise from 'react-use-promise'
 import { ISODate } from '../../utils/time'
+import { eachDayOfInterval } from 'date-fns'
 import ld from 'lodash'
 
 type TaskStat = { x: string; y: number; tag: string; label: string }
 export type ITaskStats = [
   { [key: string]: Array<TaskStat> },
-  Array<{ value: number; tag: string }>
+  Array<{ value: number; tag: string }>,
+  TaskStat[]
 ]
 type queryResults = { value: number; key: [string, string, string, string] }
 
@@ -66,14 +68,14 @@ export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
               // this allows us to filter our dates in multiple ways
               const dateKey = doc.date.map((i: any) => i.padStart(2, '0'))
 
-              emit([doc.tags[i], ...dateKey], doc.duration)
+              emit([...dateKey, doc.tags[i]], doc.duration)
             }
           },
           reduce: '_sum'
         },
         {
-          startkey: ['', ...ISODate(startDate).split('-')],
-          endkey: ['\ufff0', ...ISODate(endDate).split('-')],
+          startkey: [...ISODate(startDate).split('-'), ''],
+          endkey: [...ISODate(endDate).split('-'), '\ufff0'],
           group: true,
           group_level: 4,
           reduce: true
@@ -85,7 +87,7 @@ export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
   const hash: { [key: string]: Array<TaskStat> } = {}
   if (result) {
     result.rows.forEach(({ value, key }: queryResults) => {
-      const [tag, y, m, d] = key
+      const [y, m, d, tag] = key
       if (!(tag in hash)) {
         hash[tag] = []
       }
@@ -103,8 +105,16 @@ export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
         }))
         .sort((a, b) => b.value - a.value)
     : []
+  const interval = eachDayOfInterval({ start: startDate, end: endDate }).map(
+    (d: Date) => ({
+      x: (d.getDate() + '').padStart(2, '0'),
+      y: 0,
+      label: '',
+      tag: ''
+    })
+  )
 
-  return [hash, tags]
+  return [hash, tags, interval]
 }
 
 export const useDeleteTask = () => {
