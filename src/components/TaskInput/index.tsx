@@ -75,7 +75,7 @@ export const useTaskInput = (cb: Function) => {
     setTags([])
   }
   const onAddCheckin = () => {
-    cb(title, duration, [], new Date().toISOString(), reset)
+    cb(title, duration, tags, new Date().toISOString(), reset)
   }
 
   return {

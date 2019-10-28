@@ -17,7 +17,7 @@ const TaskRow: React.FC<ITaskRow> = props => {
     <Container>
       <TaskRowMain>
         <TaskRowTitle>{props.title}</TaskRowTitle>
-        <TaskTagList />
+        <TaskTagList tags={props.tags} />
       </TaskRowMain>
       <TaskTime>
         {hours}hrs {minutes}m
@@ -26,8 +26,14 @@ const TaskRow: React.FC<ITaskRow> = props => {
   )
 }
 
-const TaskTagList: React.FC = () => {
-  return <TaskTag>piano</TaskTag>
+const TaskTagList: React.FC<{ tags: string[] }> = props => {
+  return (
+    <React.Fragment>
+      {props.tags.map((tag: string) => (
+        <TaskTag key={tag}>{tag}</TaskTag>
+      ))}
+    </React.Fragment>
+  )
 }
 
 const Container = styled.div`
