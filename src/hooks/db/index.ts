@@ -36,15 +36,18 @@ export const useTaskStats = (): ITaskStats => {
         {
           map: function (doc: any, emit: any) {
             for (let i = 0; i < doc.tags.length; i++) {
-              console.log(doc.date)
-              emit([...doc.date, doc.tags[i]], doc.duration)
+              // we split date and use format ['2019', '08', '01']
+              // this allows us to filter our dates in multiple ways
+              const dateKey = doc.date.map((i: any) => i.padStart(2, '0'))
+
+              emit([doc.tags[i], ...dateKey], doc.duration)
             }
           },
           reduce: '_sum'
         },
         {
-          startkey: [...ISODate(startkey).split('-'), ''],
-          endkey: [...ISODate(endkey).split('-'), ''],
+          startkey: ['', ...ISODate(startkey).split('-')],
+          endkey: ['\ufff0', ...ISODate(endkey).split('-')],
           group: true,
           group_level: 4,
           reduce: true
@@ -64,7 +67,7 @@ export const useTaskStats = (): ITaskStats => {
   }
   if (result) {
     result.rows.forEach(({ value, key }: queryResults) => {
-      const [y, m, d, tag] = key
+      const [tag, y, m, d] = key
       if (!(tag in hash)) {
         hash[tag] = []
       }
@@ -75,10 +78,12 @@ export const useTaskStats = (): ITaskStats => {
   const sumHashValues = (o: Array<TaskStat>) =>
     o.reduce((acc: number, i) => acc + i.y, 0)
   const tags: ITaskStats[1] = result
-    ? Object.values(hash).map(o => ({
-        tag: o[0].label,
-        value: sumHashValues(o)
-      }))
+    ? Object.values(hash)
+        .map(o => ({
+          tag: o[0].label,
+          value: sumHashValues(o)
+        }))
+        .sort((a, b) => b.value - a.value)
     : []
 
   return [hash, tags]
