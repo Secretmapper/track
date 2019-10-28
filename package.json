@@ -7,6 +7,7 @@
     "@types/node": "12.11.7",
     "@types/react": "16.9.11",
     "@types/react-dom": "16.9.3",
+    "@types/victory": "^33.0.0",
     "pouchdb": "^7.1.1",
     "react": "^16.11.0",
     "react-autosize-textarea": "^7.0.0",
@@ -16,7 +17,8 @@
     "react-scripts": "3.2.0",
     "react-use-promise": "^0.2.0",
     "styled-components": "^4.4.0",
-    "typescript": "3.6.4"
+    "typescript": "3.6.4",
+    "victory": "^33.1.1"
   },
   "scripts": {
     "start": "react-scripts start",
