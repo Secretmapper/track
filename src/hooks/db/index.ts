@@ -1,15 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useDB } from 'react-pouchdb'
 import { ISODate } from '../../utils/time'
-import { eachDayOfInterval } from 'date-fns'
 import ld from 'lodash'
 
 type TaskStat = { x: string | number; y: number; tag: string; label: string }
-export type ITaskStats = [
-  { [key: string]: Array<TaskStat> },
-  Array<{ value: number; tag: string }>,
-  TaskStat[]
-]
+export type ITaskStats = [Array<{ value: number; key: string }>]
 type queryResults = { value: number; key: [string, string, string, string] }
 
 // we use this context value to force rerenders on task data changes
@@ -64,58 +59,26 @@ export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
         {
           map: function (doc: any, emit: any) {
             for (let i = 0; i < doc.tags.length; i++) {
-              // we split date and use format ['2019', '08', '01']
-              // this allows us to filter our dates in multiple ways
-              emit([...doc.date, doc.tags[i]], doc.duration)
+              emit(doc.tags[i], doc.duration)
             }
           },
           reduce: '_sum'
         },
         {
-          startkey: [...dateForDb(startDate), ''],
-          endkey: [...dateForDb(endDate), '\ufff0'],
           group: true,
-          group_level: 4,
-          reduce: true
+          reduce: true,
+          sort: ['value']
         }
       )
+      result.rows.sort((a: any, b: any) => b.value - a.value)
       setResult(result)
     }
 
     query()
-  }, [value, startDate, endDate])
+  }, [value, startDate, endDate, db])
+  const tags = result ? result.rows : []
 
-  const hash: { [key: string]: Array<TaskStat> } = {}
-  if (result) {
-    result.rows.forEach(({ value, key }: queryResults) => {
-      const [y, m, d, tag] = key
-      if (!(tag in hash)) {
-        hash[tag] = []
-      }
-
-      hash[tag].push({ x: d, y: value, tag, label: '' })
-    })
-  }
-  const sumHashValues = (o: Array<TaskStat>) =>
-    o.reduce((acc: number, i) => acc + i.y, 0)
-  const tags: ITaskStats[1] = result
-    ? Object.values(hash)
-        .map(o => ({
-          tag: o[0].tag,
-          value: sumHashValues(o)
-        }))
-        .sort((a, b) => b.value - a.value)
-    : []
-  const interval = eachDayOfInterval({ start: startDate, end: endDate }).map(
-    (d: Date) => ({
-      x: d.getDate(),
-      y: 0,
-      label: '',
-      tag: ''
-    })
-  )
-
-  return [hash, tags, interval]
+  return [tags]
 }
 
 export const useDeleteTask = () => {
