@@ -12,8 +12,14 @@ type queryResults = { value: number; key: [string, string, string, string] }
 
 export const useSaveTask = () => {
   const db = useDB('tasks')
-  return (title: string, duration: number, tags: string[], date: Date) => {
-    db.post({
+  return (
+    title: string,
+    duration: number,
+    tags: string[],
+    date: Date,
+    doc?: any
+  ) => {
+    const changeset = {
       title,
       duration,
       // join tags, split on ',', trim and remove ln < 0
@@ -25,7 +31,13 @@ export const useSaveTask = () => {
           .filter(i => i.length > 0)
       ),
       date: ISODate(date).split('-')
-    })
+    }
+
+    if (doc) {
+      db.put({ ...doc, ...changeset })
+    } else {
+      db.post(changeset)
+    }
   }
 }
 

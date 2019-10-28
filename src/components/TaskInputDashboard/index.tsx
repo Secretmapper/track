@@ -1,11 +1,11 @@
 import React, { useState, Suspense } from 'react'
 import styled from 'styled-components'
 import Calendar from 'react-calendar'
-import TaskInputDetail from '../TaskInputDetail'
+import TaskInputDetail, { useTaskInputDetail } from '../TaskInputDetail'
 import TaskRow from '../TaskRow'
 import TaskInput, { useTaskInput } from '../TaskInput'
 import { ISODate } from '../../utils/time'
-import { useDeleteTask } from '../../hooks/db'
+import { useDeleteTask, useSaveTask } from '../../hooks/db'
 
 import { useFind } from 'react-pouchdb'
 
@@ -17,6 +17,7 @@ const Tasks: React.FC<ITasks> = props => {
     selector: { date: { $eq: ISODate(props.date).split('-') } }
   })
   const [activeId, setActiveId] = useState<string>('')
+  const saveTask = useSaveTask()
   const removeTask = useDeleteTask()
 
   return docs.map((doc: any) => (
@@ -30,13 +31,12 @@ const Tasks: React.FC<ITasks> = props => {
         onActive={() => setActiveId(doc._id)}
       />
       {doc._id === activeId && (
-        <TaskInputDetail
-          flush
-          show={true}
+        <EditableTaskInputDetail
+          doc={doc}
           description={doc.title}
           duration={doc.duration}
           tags={doc.tags}
-          label='Save'
+          onSave={saveTask}
           onDelete={() => {
             removeTask(doc)
           }}
@@ -44,6 +44,35 @@ const Tasks: React.FC<ITasks> = props => {
       )}
     </React.Fragment>
   ))
+}
+
+const EditableTaskInputDetail = (props: any) => {
+  const { title, duration, tags, ...taskInputDetail } = useTaskInputDetail(
+    props.description,
+    props.duration,
+    props.tags
+  )
+  const [date] = useState(() => {
+    const [y, m, d] = props.doc.date
+
+    return new Date(y, parseInt(m, 10) - 1, d)
+  })
+
+  return (
+    <TaskInputDetail
+      flush
+      description={title}
+      duration={duration}
+      tags={tags}
+      {...taskInputDetail}
+      show={true}
+      label='Save'
+      onAddCheckin={() => {
+        props.onSave(title, duration, tags, date, props.doc)
+      }}
+      onDelete={props.onDelete}
+    />
+  )
 }
 
 const TaskInputDashboard: React.FC = () => {

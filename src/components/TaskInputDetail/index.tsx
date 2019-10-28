@@ -9,10 +9,10 @@ import {
   minutesToMs
 } from '../../utils/time'
 
-export const useTaskInputDetail = () => {
-  const [title, setTitle] = useState('')
-  const [duration, setDuration] = useState(0)
-  const [tags, setTags] = useState<string[]>([])
+export const useTaskInputDetail = (dTitle = '', dDuration = 0, dTags = []) => {
+  const [title, setTitle] = useState(dTitle)
+  const [duration, setDuration] = useState(dDuration)
+  const [tags, setTags] = useState<string[]>(dTags)
 
   const onDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = removeNewlines(e.target!.value)
