@@ -7,6 +7,8 @@ export type ITaskRow = {
   title: string
   tags: string[]
   duration: number
+  active?: boolean
+  onActive: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
 }
 
 const TaskRow: React.FC<ITaskRow> = props => {
@@ -14,13 +16,16 @@ const TaskRow: React.FC<ITaskRow> = props => {
   const hours = msToHours(props.duration)
 
   return (
-    <Container>
+    <Container onClick={props.onActive} active={props.active}>
       <TaskRowMain>
         <TaskRowTitle>{props.title}</TaskRowTitle>
         <TaskTagList tags={props.tags} />
       </TaskRowMain>
       <TaskTime>
-        {hours}hrs {minutes}m
+        <TaskDuration>
+          {hours}hrs {minutes}m
+        </TaskDuration>
+        <TaskAction>Edit</TaskAction>
       </TaskTime>
     </Container>
   )
@@ -36,11 +41,30 @@ const TaskTagList: React.FC<{ tags: string[] }> = props => {
   )
 }
 
-const Container = styled.div`
+const TaskAction = styled.div`
+  color: #404040;
+  font-size: 12px;
+  text-decoration: none;
+`
+
+const Container = styled.div<{ active?: boolean }>`
   border-bottom: 1px solid #efefef;
+  cursor: pointer;
   display: grid;
   padding: 8px;
   grid-template-areas: 'main main main main right';
+  ${props =>
+    props.active &&
+    `
+    background: #f0f0f0;
+  `}
+  ${TaskAction} {
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  &:hover ${TaskAction} {
+    opacity: 1;
+  }
 `
 
 const TaskRowMain = styled.div`
@@ -50,6 +74,10 @@ const TaskRowMain = styled.div`
 const TaskTime = styled.div`
   grid-area: right;
   text-align: right;
+`
+
+const TaskDuration = styled.div`
+  padding-bottom: 8px;
 `
 
 const TaskRowTitle = styled.div`

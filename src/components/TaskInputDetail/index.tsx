@@ -5,20 +5,23 @@ import { msToMinutes, msToHours } from '../../utils/time'
 
 export type ITaskInputDetail = {
   show: boolean
+  flush?: boolean
+  label?: string
   description: string
   duration: number
   tags: string[]
-  onAddCheckin: (event: React.MouseEvent<HTMLButtonElement>) => void
-  onHourChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  onMinuteChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  onTagsChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
+  onAddCheckin?: (event: React.MouseEvent<HTMLButtonElement>) => void
+  onHourChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onMinuteChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onTagsChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
+  onDelete?: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
 const TaskInputDetail: React.FC<ITaskInputDetail> = props => {
   const minutes = msToMinutes(props.duration)
   const hours = msToHours(props.duration)
 
   return (
-    <Container show={props.show}>
+    <Container show={props.show} flush={props.flush}>
       <DescriptionInput value={props.description} rows={1} maxRows={4} />
       <InputDetailRow>
         <InputDetailLabel>duration</InputDetailLabel>
@@ -54,23 +57,35 @@ const TaskInputDetail: React.FC<ITaskInputDetail> = props => {
           maxRows={3}
         />
       </InputDetailRow>
-      <Button onClick={props.onAddCheckin}>Add Checkin</Button>
+      <Button onClick={props.onAddCheckin}>
+        {props.label || 'Add Checkin'}
+      </Button>
+      {props.onDelete && (
+        <Button onClick={props.onDelete} variant='delete'>
+          Delete
+        </Button>
+      )}
     </Container>
   )
 }
 
-const Container = styled.div<{ show: boolean }>`
-  position: absolute;
+const Container = styled.div<{ show: boolean; flush?: boolean }>`
   background-color: #f6f6f6;
   border-radius: 4px;
   height: 200px;
   margin: 8px 0;
   padding: 4px;
+  position: absolute;
   text-align: center;
   transition: transform 0.2s;
   transform: scale3d(0, 0, 0) translateY(200px);
   transform-origin: top;
   width: 100%;
+  ${props =>
+    props.flush &&
+    `
+    position: relative;
+  `}
   ${props =>
     props.show &&
     `
@@ -127,7 +142,7 @@ const InputDetailDurInput = styled(InputDetailInput)`
   width: 50%;
 `
 
-const Button = styled.button`
+const Button = styled.button<{ variant?: string }>`
   background: #00a0ff;
   border: 0;
   border-radius: 4px;
@@ -141,6 +156,16 @@ const Button = styled.button`
   &:focus {
     background: #0090e9;
   }
+  ${props =>
+    props.variant === 'delete' &&
+    `
+    margin-left: 8px;
+    background: #ff4000;
+    &:active,
+    &:focus {
+      background: #e90000;
+    }
+  `}
 `
 
 export default TaskInputDetail

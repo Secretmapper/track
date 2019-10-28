@@ -74,7 +74,7 @@ export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
         hash[tag] = []
       }
 
-      hash[tag].push({ x: d, y: value, label: tag })
+      hash[tag].push({ x: d, y: value, label: '' })
     })
   }
   const sumHashValues = (o: Array<TaskStat>) =>
@@ -89,4 +89,9 @@ export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
     : []
 
   return [hash, tags]
+}
+
+export const useDeleteTask = () => {
+  const db = useDB('tasks')
+  return db.remove
 }
