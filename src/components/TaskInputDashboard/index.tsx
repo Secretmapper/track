@@ -5,7 +5,7 @@ import TaskRow from '../TaskRow'
 import TaskInput, { useTaskInput } from '../TaskInput'
 import { ISODate } from '../../utils/time'
 
-import { PouchDB, useFind } from 'react-pouchdb'
+import { useFind } from 'react-pouchdb'
 
 type ITasks = {
   date: Date
@@ -30,28 +30,26 @@ const TaskInputDashboard: React.FC = () => {
   const taskInput = useTaskInput(date)
 
   return (
-    <PouchDB name='tasks'>
-      <Container>
-        <TaskInput {...taskInput} />
-        <Rows show={taskInput.expand}>
-          <TaskCalendar
-            value={date}
-            onChange={date => {
-              if (!(date instanceof Array)) {
-                setDate(date)
-              }
-            }}
-            maxDate={new Date()}
-            minDetail='month'
-            prev2Label={null}
-            next2Label={null}
-          />
-          <Suspense fallback=''>
-            <Tasks date={date} />
-          </Suspense>
-        </Rows>
-      </Container>
-    </PouchDB>
+    <Container>
+      <TaskInput {...taskInput} />
+      <Rows show={taskInput.expand}>
+        <TaskCalendar
+          value={date}
+          onChange={date => {
+            if (!(date instanceof Array)) {
+              setDate(date)
+            }
+          }}
+          maxDate={new Date()}
+          minDetail='month'
+          prev2Label={null}
+          next2Label={null}
+        />
+        <Suspense fallback=''>
+          <Tasks date={date} />
+        </Suspense>
+      </Rows>
+    </Container>
   )
 }
 
