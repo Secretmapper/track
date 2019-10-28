@@ -1,6 +1,5 @@
 import { useDB } from 'react-pouchdb'
 import usePromise from 'react-use-promise'
-import PouchDB from 'pouchdb'
 import { ISODate } from '../../utils/time'
 
 type TaskStat = { x: string; y: number; label: string }
@@ -22,13 +21,8 @@ export const useSaveTask = () => {
   }
 }
 
-export const useTaskStats = (): ITaskStats => {
+export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
   const db = useDB()
-
-  const startkey = new Date()
-  startkey.setDate(new Date().getDate() - 3)
-  const endkey = new Date()
-  endkey.setDate(new Date().getDate() + 1)
 
   const [result] = usePromise(
     () =>
@@ -46,8 +40,8 @@ export const useTaskStats = (): ITaskStats => {
           reduce: '_sum'
         },
         {
-          startkey: ['', ...ISODate(startkey).split('-')],
-          endkey: ['\ufff0', ...ISODate(endkey).split('-')],
+          startkey: ['', ...ISODate(startDate).split('-')],
+          endkey: ['\ufff0', ...ISODate(endDate).split('-')],
           group: true,
           group_level: 4,
           reduce: true
@@ -72,7 +66,7 @@ export const useTaskStats = (): ITaskStats => {
         hash[tag] = []
       }
 
-      hash[tag].push({ x: [y, m, d].join('-'), y: value, label: tag })
+      hash[tag].push({ x: d, y: value, label: tag })
     })
   }
   const sumHashValues = (o: Array<TaskStat>) =>

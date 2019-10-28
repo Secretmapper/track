@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react'
 import styled from 'styled-components'
+import { addWeeks, format } from 'date-fns'
 import TaskTag from '../TaskTag'
 import { useTaskStats } from '../../hooks/db'
 import { msToMinutes, msToHours } from '../../utils/time'
@@ -7,23 +8,35 @@ import { msToMinutes, msToHours } from '../../utils/time'
 import { VictoryChart, VictoryAxis, VictoryStack, VictoryBar } from 'victory'
 
 const TaskStats: React.FC = () => {
+  const endDate = new Date()
+  const startDate = addWeeks(endDate, -1)
+  const startDateLabel = format(startDate, 'LLL dd, yyyy')
+  const endDateLabel = format(endDate, 'LLL dd, yyyy')
+
   return (
     <Container>
-      <TaskStatsDate>Oct 7 - Oct 11</TaskStatsDate>
+      <TaskStatsDate>
+        {startDateLabel} - {endDateLabel}
+      </TaskStatsDate>
       <HeatmapContainer />
       <Suspense fallback=''>
-        <TaskList />
+        <TaskList startDate={startDate} endDate={endDate} />
       </Suspense>
     </Container>
   )
 }
 
-const TaskList: React.FC = () => {
-  const [stats, tags] = useTaskStats()
+type ITaskList = {
+  startDate: Date
+  endDate: Date
+}
+
+const TaskList: React.FC<ITaskList> = props => {
+  const [stats, tags] = useTaskStats(props.startDate, props.endDate)
 
   return (
     <div>
-      <VictoryChart domainPadding={{ x: 50 }}>
+      <VictoryChart domainPadding={{ x: 50 }} scale={{ x: 'time' }}>
         <VictoryStack
           colorScale={['gold', 'orange', 'tomato']}
           style={victoryStyles}
