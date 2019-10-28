@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react'
 import styled from 'styled-components'
 import { addWeeks, format } from 'date-fns'
+import colorHash from '../../utils/colorHash'
 import TaskTag from '../TaskTag'
 import { useTaskStats } from '../../hooks/db'
 import { msToMinutes, msToHours } from '../../utils/time'
@@ -37,12 +38,9 @@ const TaskList: React.FC<ITaskList> = props => {
   return (
     <div>
       <VictoryChart domainPadding={{ x: 50 }} scale={{ x: 'time' }}>
-        <VictoryStack
-          colorScale={['gold', 'orange', 'tomato']}
-          style={victoryStyles}
-        >
+        <VictoryStack colorScale='heatmap' style={victoryStyles}>
           {Object.keys(stats).map(tag => (
-            <VictoryBar key={tag} data={stats[tag]} />
+            <VictoryBar key={tag} data={stats[tag]} style={barStyles(tag)} />
           ))}
         </VictoryStack>
         <VictoryAxis />
@@ -51,7 +49,7 @@ const TaskList: React.FC<ITaskList> = props => {
         <div key={tag}>
           {tag && (
             <TaskTagRow>
-              <TaskTag>{tag}</TaskTag>
+              <TaskTag label={tag} />
               <TaskTagTime>
                 {msToHours(value)}h {msToMinutes(value)}m
               </TaskTagTime>
@@ -67,6 +65,9 @@ const victoryStyles = {
   data: { width: 30 },
   labels: { padding: -20 }
 }
+const barStyles = (tag: string) => ({
+  data: { fill: colorHash.hex(tag) }
+})
 
 const Container = styled.div``
 

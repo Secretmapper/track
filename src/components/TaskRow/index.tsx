@@ -35,7 +35,7 @@ const TaskTagList: React.FC<{ tags: string[] }> = props => {
   return (
     <React.Fragment>
       {props.tags.map((tag: string) => (
-        <TaskTag key={tag}>{tag}</TaskTag>
+        <TaskTag key={tag} label={tag} />
       ))}
     </React.Fragment>
   )
