@@ -1,3 +1,4 @@
+import React, { useContext } from 'react'
 import { useDB } from 'react-pouchdb'
 import usePromise from 'react-use-promise'
 import { ISODate } from '../../utils/time'
@@ -10,8 +11,17 @@ export type ITaskStats = [
 ]
 type queryResults = { value: number; key: [string, string, string, string] }
 
+// we use this context value to force rerenders on task data changes
+// as map/reduce queries cannot be subscribed to
+export const TasksKeyContext = React.createContext({
+  value: 0,
+  retrigger: () => {}
+})
+
 export const useSaveTask = () => {
   const db = useDB('tasks')
+  const { retrigger } = useContext(TasksKeyContext)
+
   return (
     title: string,
     duration: number,
@@ -38,10 +48,12 @@ export const useSaveTask = () => {
     } else {
       db.post(changeset)
     }
+    retrigger()
   }
 }
 
 export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
+  const { value } = useContext(TasksKeyContext)
   const db = useDB()
 
   const [result] = usePromise(
@@ -67,7 +79,7 @@ export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
           reduce: true
         }
       ),
-    []
+    [value]
   )
 
   const hash: { [key: string]: Array<TaskStat> } = {}
