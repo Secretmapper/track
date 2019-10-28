@@ -2,7 +2,7 @@ import React, { Suspense } from 'react'
 import styled from 'styled-components'
 import TaskTag from '../TaskTag'
 import { useTaskStats } from '../../hooks/db'
-import { ISODate, msToMinutes, msToHours } from '../../utils/time'
+import { msToMinutes, msToHours } from '../../utils/time'
 
 import { VictoryChart, VictoryAxis, VictoryStack, VictoryBar } from 'victory'
 
@@ -21,14 +21,6 @@ const TaskStats: React.FC = () => {
 const TaskList: React.FC = () => {
   const [stats, tags] = useTaskStats()
 
-  let d: any = new Date()
-  d.setDate(new Date().getDate() - 1)
-  d = ISODate(d)
-
-  let da: any = new Date()
-  da.setDate(new Date().getDate())
-  da = ISODate(da)
-
   return (
     <div>
       <VictoryChart domainPadding={{ x: 50 }}>
@@ -44,10 +36,14 @@ const TaskList: React.FC = () => {
       </VictoryChart>
       {tags.map(({ value, tag }) => (
         <div key={tag}>
-          <TaskTag>{tag}</TaskTag>
-          <TaskTagTime>
-            {msToHours(value)}h {msToMinutes(value)}m
-          </TaskTagTime>
+          {tag && (
+            <React.Fragment>
+              <TaskTag>{tag}</TaskTag>
+              <TaskTagTime>
+                {msToHours(value)}h {msToMinutes(value)}m
+              </TaskTagTime>
+            </React.Fragment>
+          )}
         </div>
       ))}
     </div>

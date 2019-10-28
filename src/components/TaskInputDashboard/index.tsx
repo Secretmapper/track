@@ -12,7 +12,7 @@ type ITasks = {
 }
 const Tasks: React.FC<ITasks> = props => {
   const docs = useFind({
-    selector: { date: { $eq: ISODate(props.date) } }
+    selector: { date: { $eq: ISODate(props.date).split('-') } }
   })
 
   return docs.map((doc: any) => (

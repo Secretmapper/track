@@ -1,13 +1,14 @@
 import { useDB } from 'react-pouchdb'
 import usePromise from 'react-use-promise'
-import { ISODate, msToMinutes } from '../../utils/time'
+import PouchDB from 'pouchdb'
+import { ISODate } from '../../utils/time'
 
 type TaskStat = { x: string; y: number; label: string }
 export type ITaskStats = [
   { [key: string]: Array<TaskStat> },
   Array<{ value: number; tag: string }>
 ]
-type queryResults = { value: number; key: [string, string] }
+type queryResults = { value: number; key: [string, string, string, string] }
 
 export const useSaveTask = () => {
   const db = useDB('tasks')
@@ -16,13 +17,14 @@ export const useSaveTask = () => {
       title,
       duration,
       tags,
-      date: ISODate(date)
+      date: ISODate(date).split('-')
     })
   }
 }
 
 export const useTaskStats = (): ITaskStats => {
-  const db = useDB('tasks')
+  const db = useDB()
+
   const startkey = new Date()
   startkey.setDate(new Date().getDate() - 3)
   const endkey = new Date()
@@ -34,31 +36,40 @@ export const useTaskStats = (): ITaskStats => {
         {
           map: function (doc: any, emit: any) {
             for (let i = 0; i < doc.tags.length; i++) {
-              emit([doc.date, doc.tags[i]], doc.duration)
+              console.log(doc.date)
+              emit([...doc.date, doc.tags[i]], doc.duration)
             }
           },
           reduce: '_sum'
         },
         {
-          startkey: [ISODate(startkey), ''],
-          endkey: [ISODate(endkey), ''],
+          startkey: [...ISODate(startkey).split('-'), ''],
+          endkey: [...ISODate(endkey).split('-'), ''],
           group: true,
-          group_level: 2,
+          group_level: 4,
           reduce: true
         }
       ),
     []
   )
 
-  const hash: { [key: string]: Array<TaskStat> } = {}
+  const hash: { [key: string]: Array<TaskStat> } = {
+    '': [
+      {
+        x: '2019',
+        y: 0,
+        label: ''
+      }
+    ]
+  }
   if (result) {
     result.rows.forEach(({ value, key }: queryResults) => {
-      const [date, tag] = key
+      const [y, m, d, tag] = key
       if (!(tag in hash)) {
         hash[tag] = []
       }
 
-      hash[tag].push({ x: date, y: value, label: tag })
+      hash[tag].push({ x: [y, m, d].join('-'), y: value, label: tag })
     })
   }
   const sumHashValues = (o: Array<TaskStat>) =>
