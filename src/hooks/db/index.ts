@@ -4,7 +4,7 @@ import { ISODate } from '../../utils/time'
 import { eachDayOfInterval } from 'date-fns'
 import ld from 'lodash'
 
-type TaskStat = { x: string; y: number; tag: string; label: string }
+type TaskStat = { x: string | number; y: number; tag: string; label: string }
 export type ITaskStats = [
   { [key: string]: Array<TaskStat> },
   Array<{ value: number; tag: string }>,
@@ -41,7 +41,7 @@ export const useSaveTask = () => {
           .map(s => s.trim())
           .filter(i => i.length > 0)
       ),
-      date: ISODate(date).split('-')
+      date: dateForDb(date)
     }
 
     if (doc) {
@@ -66,16 +66,14 @@ export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
             for (let i = 0; i < doc.tags.length; i++) {
               // we split date and use format ['2019', '08', '01']
               // this allows us to filter our dates in multiple ways
-              const dateKey = doc.date.map((i: any) => i.padStart(2, '0'))
-
-              emit([...dateKey, doc.tags[i]], doc.duration)
+              emit([...doc.date, doc.tags[i]], doc.duration)
             }
           },
           reduce: '_sum'
         },
         {
-          startkey: [...ISODate(startDate).split('-'), ''],
-          endkey: [...ISODate(endDate).split('-'), '\ufff0'],
+          startkey: [...dateForDb(startDate), ''],
+          endkey: [...dateForDb(endDate), '\ufff0'],
           group: true,
           group_level: 4,
           reduce: true
@@ -85,7 +83,7 @@ export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
     }
 
     query()
-  }, [value])
+  }, [value, startDate, endDate])
 
   const hash: { [key: string]: Array<TaskStat> } = {}
   if (result) {
@@ -110,7 +108,7 @@ export const useTaskStats = (startDate: Date, endDate: Date): ITaskStats => {
     : []
   const interval = eachDayOfInterval({ start: startDate, end: endDate }).map(
     (d: Date) => ({
-      x: (d.getDate() + '').padStart(2, '0'),
+      x: d.getDate(),
       y: 0,
       label: '',
       tag: ''
@@ -128,3 +126,8 @@ export const useDeleteTask = () => {
     db.remove(doc, retrigger)
   }
 }
+
+export const dateForDb = (date: Date) =>
+  ISODate(date)
+    .split('-')
+    .map(d => d.padStart(2, '0'))

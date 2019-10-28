@@ -1,24 +1,27 @@
-import React, { Suspense } from 'react'
+import React, { Suspense, useState } from 'react'
 import styled from 'styled-components'
-import { addWeeks, format } from 'date-fns'
+import DateRangePicker from '@wojtekmaj/react-daterange-picker'
+import { addWeeks } from 'date-fns'
 import colorHash from '../../utils/colorHash'
 import TaskTag from '../TaskTag'
 import { useTaskStats } from '../../hooks/db'
 import { msToMinutes, msToHours } from '../../utils/time'
 
-import { VictoryChart, VictoryAxis, VictoryStack, VictoryBar } from 'victory'
+import { VictoryChart, VictoryStack, VictoryBar } from 'victory'
 
 const TaskStats: React.FC = () => {
-  const endDate = new Date()
-  const startDate = addWeeks(endDate, -1)
-  const startDateLabel = format(startDate, 'LLL dd, yyyy')
-  const endDateLabel = format(endDate, 'LLL dd, yyyy')
+  const [endDate, setEndDate] = useState(new Date())
+  const [startDate, setStartDate] = useState(addWeeks(endDate, -1))
 
   return (
     <Container>
-      <TaskStatsDate>
-        {startDateLabel} - {endDateLabel}
-      </TaskStatsDate>
+      <DateRangePicker
+        onChange={(date: [Date, Date]) => {
+          setStartDate(date[0])
+          setEndDate(date[1])
+        }}
+        value={[startDate, endDate]}
+      />
       <HeatmapContainer />
       <Suspense fallback=''>
         <TaskList startDate={startDate} endDate={endDate} />
@@ -35,17 +38,24 @@ type ITaskList = {
 const TaskList: React.FC<ITaskList> = props => {
   const [stats, tags, interval] = useTaskStats(props.startDate, props.endDate)
 
+  console.log(stats, tags, interval)
   return (
     <div>
-      <VictoryChart domainPadding={{ x: 50 }} scale={{ x: 'time' }}>
-        <VictoryStack colorScale='heatmap' style={victoryStyles}>
-          <VictoryBar data={interval} />
-          {Object.keys(stats).map(tag => (
-            <VictoryBar key={tag} data={stats[tag]} style={barStyles(tag)} />
-          ))}
-        </VictoryStack>
-        <VictoryAxis />
-      </VictoryChart>
+      <ChartContainer>
+        <VictoryChart>
+          <VictoryStack domainPadding={{ x: 25 }} style={victoryStyles}>
+            <VictoryBar data={interval} />
+            {Object.keys(stats).map(tag => (
+              <VictoryBar
+                key={tag}
+                data={stats[tag]}
+                barWidth={3}
+                style={barStyles(tag)}
+              />
+            ))}
+          </VictoryStack>
+        </VictoryChart>
+      </ChartContainer>
       {tags.map(({ value, tag }) => (
         <div key={tag}>
           {tag && (
@@ -72,11 +82,11 @@ const barStyles = (tag: string) => ({
 
 const Container = styled.div``
 
-const HeatmapContainer = styled.div``
-
-const TaskStatsDate = styled.h2`
-  margin-top: 8px;
+const ChartContainer = styled.div`
+  max-width: 600px;
 `
+
+const HeatmapContainer = styled.div``
 
 const TaskTagRow = styled.div`
   margin-bottom: 4px;

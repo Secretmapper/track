@@ -9,6 +9,7 @@
     "@types/react": "16.9.11",
     "@types/react-dom": "16.9.3",
     "@types/victory": "^33.0.0",
+    "@wojtekmaj/react-daterange-picker": "^2.4.0",
     "color-hash": "^1.0.3",
     "date-fns": "^2.6.0",
     "lodash": "^4.17.15",

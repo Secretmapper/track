@@ -4,8 +4,7 @@ import Calendar from 'react-calendar'
 import TaskInputDetail, { useTaskInputDetail } from '../TaskInputDetail'
 import TaskRow from '../TaskRow'
 import TaskInput, { useTaskInput } from '../TaskInput'
-import { ISODate } from '../../utils/time'
-import { useDeleteTask, useSaveTask } from '../../hooks/db'
+import { useDeleteTask, useSaveTask, dateForDb } from '../../hooks/db'
 
 import { useFind } from 'react-pouchdb'
 
@@ -14,7 +13,7 @@ type ITasks = {
 }
 const Tasks: React.FC<ITasks> = props => {
   const docs = useFind({
-    selector: { date: { $eq: ISODate(props.date).split('-') } }
+    selector: { date: { $eq: dateForDb(props.date) } }
   })
   const [activeId, setActiveId] = useState<string>('')
   const saveTask: ReturnType<typeof useSaveTask> = useSaveTask()

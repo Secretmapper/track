@@ -23,6 +23,8 @@ const Aside = styled.div`
   width: 400px;
 `
 
-const Main = styled.div``
+const Main = styled.div`
+  width: 100%;
+`
 
 export default Layout
