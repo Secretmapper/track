@@ -1,7 +1,53 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import Textarea from 'react-autosize-textarea'
-import { msToMinutes, msToHours } from '../../utils/time'
+import removeNewlines from '../../utils/removeNewlines'
+import {
+  msToMinutes,
+  msToHours,
+  hoursToMs,
+  minutesToMs
+} from '../../utils/time'
+
+export const useTaskInputDetail = () => {
+  const [title, setTitle] = useState('')
+  const [duration, setDuration] = useState(0)
+  const [tags, setTags] = useState<string[]>([])
+
+  const onDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = removeNewlines(e.target!.value)
+    setTitle(value)
+  }
+  const onHourChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDuration(
+      // XXX: this looks a bit weird, because msToMinutes/Hours
+      // only converts to whole units (result is floored)
+      minutesToMs(msToMinutes(duration)) + hoursToMs(parseInt(e.target.value))
+    )
+  }
+  const onMinuteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDuration(
+      hoursToMs(msToHours(duration)) + minutesToMs(parseInt(e.target.value))
+    )
+  }
+  const onTagsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = removeNewlines(e.target!.value)
+    setTags(value.split(', '))
+  }
+
+  return {
+    title,
+    setTitle,
+    duration,
+    setDuration,
+    tags,
+    setTags,
+    onDescriptionChange,
+    onHourChange,
+    onMinuteChange,
+    onTagsChange
+  }
+}
 
 export type ITaskInputDetail = {
   show: boolean
@@ -11,6 +57,7 @@ export type ITaskInputDetail = {
   duration: number
   tags: string[]
   onAddCheckin?: (event: React.MouseEvent<HTMLButtonElement>) => void
+  onDescriptionChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
   onHourChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
   onMinuteChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
   onTagsChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
@@ -22,7 +69,12 @@ const TaskInputDetail: React.FC<ITaskInputDetail> = props => {
 
   return (
     <Container show={props.show} flush={props.flush}>
-      <DescriptionInput value={props.description} rows={1} maxRows={4} />
+      <DescriptionInput
+        value={props.description}
+        onChange={props.onDescriptionChange}
+        rows={1}
+        maxRows={4}
+      />
       <InputDetailRow>
         <InputDetailLabel>duration</InputDetailLabel>
         <div>

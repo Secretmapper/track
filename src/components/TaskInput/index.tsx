@@ -1,15 +1,9 @@
 import React, { useRef, useState } from 'react'
 import styled from 'styled-components'
 import Textarea from 'react-autosize-textarea'
-import TaskInputDetail from '../TaskInputDetail'
+import TaskInputDetail, { useTaskInputDetail } from '../TaskInputDetail'
 import parse from '../../utils/parser'
 import { useSaveTask } from '../../hooks/db'
-import {
-  msToMinutes,
-  msToHours,
-  hoursToMs,
-  minutesToMs
-} from '../../utils/time'
 
 export const useTaskInput = (date: Date) => {
   const inputEl = useRef<HTMLTextAreaElement>(null)
@@ -28,9 +22,18 @@ export const useTaskInput = (date: Date) => {
   }
 
   const [inputText, setInputText] = useState('')
-  const [title, setTitle] = useState('')
-  const [duration, setDuration] = useState(0)
-  const [tags, setTags] = useState<string[]>([])
+  const {
+    title,
+    setTitle,
+    duration,
+    setDuration,
+    tags,
+    setTags,
+    onDescriptionChange,
+    onHourChange,
+    onMinuteChange,
+    onTagsChange
+  } = useTaskInputDetail()
 
   const onChangeInputText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     // remove newlines
@@ -53,23 +56,6 @@ export const useTaskInput = (date: Date) => {
     }
   }
 
-  const onHourChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDuration(
-      // XXX: this looks a bit weird, because msToMinutes/Hours
-      // only converts to whole units (result is floored)
-      minutesToMs(msToMinutes(duration)) + hoursToMs(parseInt(e.target.value))
-    )
-  }
-  const onMinuteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDuration(
-      hoursToMs(msToHours(duration)) + minutesToMs(parseInt(e.target.value))
-    )
-  }
-  const onTagsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    // remove newlines
-    const value = e.target!.value.replace(/(\r\n|\n|\r)/gm, '')
-    setTags(value.split(', '))
-  }
   const reset = () => {
     setInputFocused(false)
     setInputText('')
@@ -91,6 +77,7 @@ export const useTaskInput = (date: Date) => {
     onInputFocus,
     onInputBlur,
     inputText,
+    onDescriptionChange,
     onChangeInputText,
     onHourChange,
     onMinuteChange,
@@ -116,6 +103,7 @@ export type ITaskInput = {
   onHourChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onMinuteChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onTagsChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
+  onDescriptionChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
 
   taskTags: string[]
   taskDescription: string
@@ -150,6 +138,7 @@ const TaskInput: React.FC<ITaskInput> = props => {
         duration={props.taskDuration}
         tags={props.taskTags}
         onAddCheckin={props.onAddCheckin}
+        onDescriptionChange={props.onDescriptionChange}
         onHourChange={props.onHourChange}
         onMinuteChange={props.onMinuteChange}
         onTagsChange={props.onTagsChange}
